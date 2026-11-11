@@ -1,0 +1,18 @@
+{
+  "name": "leuco-defensa-celular",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Survivor de arena hecho con Phaser y Vite: un glóbulo blanco contra la infección.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "phaser": "3.90.0"
+  },
+  "devDependencies": {
+    "vite": "6.3.5"
+  }
+}
