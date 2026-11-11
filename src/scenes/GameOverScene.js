@@ -3,6 +3,7 @@ import { GAME_WIDTH, FONT } from '../config.js';
 import { addRedCells } from '../systems/Background.js';
 import { loadHighScore, saveHighScore } from '../systems/HighScore.js';
 import { createButton } from '../ui/Button.js';
+import { audio } from '../systems/Audio.js';
 
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -43,14 +44,20 @@ export default class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     createButton(this, cx - 150, 540, 'Reintentar (R)', () => this.retry());
-    createButton(this, cx + 150, 540, 'Menú (M)', () => this.scene.start('Menu'));
+    createButton(this, cx + 150, 540, 'Menú (M)', () => this.goToMenu());
 
     this.input.keyboard.on('keydown-R', this.retry, this);
     this.input.keyboard.on('keydown-ENTER', this.retry, this);
-    this.input.keyboard.on('keydown-M', () => this.scene.start('Menu'));
+    this.input.keyboard.on('keydown-M', this.goToMenu, this);
   }
 
   retry() {
+    audio.play('click');
     this.scene.start('Game');
+  }
+
+  goToMenu() {
+    audio.play('click');
+    this.scene.start('Menu');
   }
 }

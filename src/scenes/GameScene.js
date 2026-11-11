@@ -19,6 +19,7 @@ import Projectile from '../entities/Projectile.js';
 import Pickup from '../entities/Pickup.js';
 import WaveManager from '../systems/WaveManager.js';
 import { addRedCells } from '../systems/Background.js';
+import { audio } from '../systems/Audio.js';
 import { pickUpgradeOptions, countUpgradeLevels, TOTAL_UPGRADE_LEVELS } from '../systems/Upgrades.js';
 
 export default class GameScene extends Phaser.Scene {
@@ -70,6 +71,7 @@ export default class GameScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-P', this.pauseGame, this);
 
     this.scene.launch('UI');
+    audio.playMusic('battle');
   }
 
   createArena() {
@@ -125,6 +127,7 @@ export default class GameScene extends Phaser.Scene {
       const projectile = this.projectiles.get();
       if (projectile) projectile.fire(this.player.x, this.player.y, angle + offset, stats.projectileSpeed, stats.damage);
     }
+    audio.play('shoot');
   }
 
   findNearestEnemy(range) {
@@ -162,6 +165,8 @@ export default class GameScene extends Phaser.Scene {
     // Se limpian los enemigos comunes para que la pelea sea solo contra el jefe.
     this.enemies.getChildren().forEach((enemy) => enemy.active && enemy.die());
     this.boss = this.waves.spawn('supervirus', this.player, 600);
+    audio.playMusic('boss');
+    audio.play('bossRoar');
   }
 
   updateBoss(delta) {
@@ -194,7 +199,11 @@ export default class GameScene extends Phaser.Scene {
     if (!projectile.active || !enemy.active) return;
 
     projectile.disableBody(true, true);
-    if (enemy.takeDamage(projectile.damage)) this.killEnemy(enemy);
+    if (enemy.takeDamage(projectile.damage)) {
+      this.killEnemy(enemy);
+    } else {
+      audio.play('enemyHit');
+    }
   }
 
   killEnemy(enemy) {
@@ -202,6 +211,7 @@ export default class GameScene extends Phaser.Scene {
     this.score += config.score;
     this.kills += 1;
     enemy.die();
+    audio.play('enemyDeath');
 
     if (config.boss) {
       this.endGame(true);
@@ -231,9 +241,10 @@ export default class GameScene extends Phaser.Scene {
   damagePlayer(amount) {
     if (this.isOver) return;
 
-    if (this.player.takeDamage(amount, this.elapsed) && this.player.isDead()) {
-      this.endGame(false, 'health');
-    }
+    if (!this.player.takeDamage(amount, this.elapsed)) return;
+
+    audio.play('playerHurt');
+    if (this.player.isDead()) this.endGame(false, 'health');
   }
 
   onPickup(player, pickup) {
@@ -245,6 +256,7 @@ export default class GameScene extends Phaser.Scene {
       this.addXp(pickup.value);
     }
     pickup.collect();
+    audio.play('pickup');
   }
 
   addXp(amount) {
@@ -277,6 +289,7 @@ export default class GameScene extends Phaser.Scene {
     if (!data) return;
 
     this.player.setVelocity(0, 0);
+    audio.play('levelUp');
     this.scene.pause();
     this.scene.launch('LevelUp', data);
   }
@@ -294,6 +307,7 @@ export default class GameScene extends Phaser.Scene {
   pauseGame() {
     if (this.isOver) return;
 
+    audio.play('click');
     this.scene.pause();
     this.scene.launch('Pause');
   }
@@ -304,6 +318,8 @@ export default class GameScene extends Phaser.Scene {
     this.physics.pause();
     this.player.setTint(victory ? 0xffffff : 0x666666);
     if (victory) this.score += WIN_BONUS;
+    audio.stopMusic();
+    audio.play(victory ? 'victory' : 'defeat');
 
     this.time.delayedCall(800, () => {
       this.scene.stop('UI');

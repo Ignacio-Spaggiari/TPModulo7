@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { COLORS } from '../config.js';
+import { audio } from '../systems/Audio.js';
 
 // Genera todas las texturas del juego con formas geométricas, sin assets externos.
 export default class BootScene extends Phaser.Scene {
@@ -67,6 +68,7 @@ export default class BootScene extends Phaser.Scene {
     });
 
     g.destroy();
+    audio.init(this.game);
     this.scene.start('Menu');
   }
 

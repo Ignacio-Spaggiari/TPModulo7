@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, FONT } from '../config.js';
 import { createButton } from '../ui/Button.js';
+import { audio } from '../systems/Audio.js';
 
 export default class PauseScene extends Phaser.Scene {
   constructor() {
@@ -24,11 +25,13 @@ export default class PauseScene extends Phaser.Scene {
   }
 
   resumeGame() {
+    audio.play('click');
     this.scene.resume('Game');
     this.scene.stop();
   }
 
   quitToMenu() {
+    audio.play('click');
     this.scene.stop('Game');
     this.scene.stop('UI');
     this.scene.start('Menu');

@@ -3,6 +3,7 @@ import { GAME_WIDTH, GAME_HEIGHT, FONT } from '../config.js';
 import { addRedCells } from '../systems/Background.js';
 import { loadHighScore } from '../systems/HighScore.js';
 import { createButton } from '../ui/Button.js';
+import { audio } from '../systems/Audio.js';
 
 export default class MenuScene extends Phaser.Scene {
   constructor() {
@@ -11,6 +12,7 @@ export default class MenuScene extends Phaser.Scene {
 
   create() {
     const cx = GAME_WIDTH / 2;
+    audio.playMusic('menu');
     addRedCells(this, 18, GAME_WIDTH, GAME_HEIGHT);
 
     this.add
@@ -46,6 +48,7 @@ export default class MenuScene extends Phaser.Scene {
   }
 
   startGame() {
+    audio.play('click');
     this.scene.start('Game');
   }
 }

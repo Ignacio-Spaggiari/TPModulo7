@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, FONT } from '../config.js';
+import { audio } from '../systems/Audio.js';
 
 const CARD_WIDTH = 300;
 const CARD_HEIGHT = 220;
@@ -58,6 +59,7 @@ export default class LevelUpScene extends Phaser.Scene {
   choose(index) {
     if (this.chosen) return;
     this.chosen = true;
+    audio.play('click');
 
     const game = this.scene.get('Game');
     game.applyUpgrade(this.options[index]);

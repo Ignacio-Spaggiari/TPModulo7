@@ -1,6 +1,6 @@
 # GDD — Leuco: Defensa Celular
 
-> Game Design Document · Versión 0.2 · Noviembre 2026
+> Game Design Document · Versión 0.3 · Noviembre 2026
 
 ---
 
@@ -149,7 +149,9 @@ Cuando el jugador tiene **las 25 mejoras al máximo**, empieza la fase final:
 
 ---
 
-## 7. Arte
+## 7. Arte y sonido
+
+### Paleta
 
 | Elemento | Color |
 |---|---|
@@ -162,6 +164,32 @@ Cuando el jugador tiene **las 25 mejoras al máximo**, empieza la fase final:
 | Parásito | `#a35fd3` |
 | Proteína (XP) | `#4fc3f7` |
 | Esporas del Supervirus | `#b8f06b` |
+
+### Sonido
+
+Todo el audio se genera por código con la Web Audio API, sin archivos externos.
+
+**Música**
+
+| Tema | Dónde suena | Estilo |
+|---|---|---|
+| Menú | Menú principal | Tranquilo y misterioso, 80 BPM: acordes suaves y arpegio |
+| Combate | Durante la partida | Enérgico, 140 BPM: batería, bajo y melodía rápida |
+| Jefe | Fase final | El tema de combate más cargado y rápido, 165 BPM |
+
+**Efectos**
+
+| Evento | Sonido |
+|---|---|
+| Disparo de anticuerpos | Zap corto y agudo |
+| Impacto en un enemigo | Golpe breve |
+| Muerte de un enemigo | Estallido con caída de tono |
+| Daño recibido | Golpe grave con ruido |
+| Recoger proteína o plaqueta | Blip agudo |
+| Subida de nivel | Arpegio ascendente |
+| Botones y selección | Click suave |
+| Aparición del Supervirus | Rugido grave |
+| Victoria / Derrota | Fanfarria ascendente / melodía descendente |
 
 ---
 
