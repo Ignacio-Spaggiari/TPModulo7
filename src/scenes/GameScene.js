@@ -256,6 +256,7 @@ export default class GameScene extends Phaser.Scene {
     if (!projectile.active || !enemy.active) return;
 
     projectile.disableBody(true, true);
+    this.effects.damageNumber(enemy.x, enemy.y, projectile.damage);
     if (enemy.takeDamage(projectile.damage)) {
       this.killEnemy(enemy);
     } else {

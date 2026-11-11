@@ -3,6 +3,8 @@ import { TRACKS, midiToFrequency } from './Music.js';
 // Todo el audio se sintetiza con la Web Audio API: no hay archivos de sonido.
 // Usa el AudioContext de Phaser, que se desbloquea solo con el primer click o tecla.
 
+const MASTER_VOLUME = 0.6;
+const MUTED_KEY = 'leuco-muted';
 const SCHEDULE_AHEAD = 0.12; // segundos de música que se programan por adelantado
 const SCHEDULER_INTERVAL = 25; // ms
 
@@ -46,6 +48,13 @@ const SFX = {
       a.noise({ duration: 1.6, volume: 0.22, filter: 450 });
       a.tone({ type: 'sine', from: 110, to: 25, duration: 1.8, volume: 0.28 });
       a.tone({ type: 'triangle', from: 70, to: 30, duration: 1.4, volume: 0.15, time: a.ctx.currentTime + 0.9 });
+    },
+  },
+  heartbeat: {
+    cooldown: 500,
+    play: (a) => {
+      a.tone({ type: 'sine', from: 75, to: 45, duration: 0.14, volume: 0.35 });
+      a.tone({ type: 'sine', from: 70, to: 42, duration: 0.12, volume: 0.25, time: a.ctx.currentTime + 0.18 });
     },
   },
   powerUp: {
@@ -105,7 +114,8 @@ class AudioManager {
     this.compressor.connect(this.ctx.destination);
 
     this.master = this.ctx.createGain();
-    this.master.gain.value = 0.6;
+    this.muted = loadMuted();
+    this.master.gain.value = this.muted ? 0 : MASTER_VOLUME;
     this.master.connect(this.compressor);
 
     this.sfxBus = this.createBus(0.7);
@@ -129,6 +139,13 @@ class AudioManager {
     const data = buffer.getChannelData(0);
     for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
     return buffer;
+  }
+
+  toggleMute() {
+    this.muted = !this.muted;
+    saveMuted(this.muted);
+    if (this.master) this.master.gain.setTargetAtTime(this.muted ? 0 : MASTER_VOLUME, this.ctx.currentTime, 0.02);
+    return this.muted;
   }
 
   play(name) {
@@ -236,6 +253,23 @@ class AudioManager {
     setTimeout(() => gain.disconnect(), 500);
 
     this.currentTrack = null;
+  }
+}
+
+// La preferencia de silencio se recuerda entre partidas; si localStorage falla, arranca con sonido.
+function loadMuted() {
+  try {
+    return localStorage.getItem(MUTED_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function saveMuted(muted) {
+  try {
+    localStorage.setItem(MUTED_KEY, String(muted));
+  } catch {
+    // Sin almacenamiento, el silencio solo dura esta sesión.
   }
 }
 

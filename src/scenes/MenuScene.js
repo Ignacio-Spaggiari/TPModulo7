@@ -33,7 +33,7 @@ export default class MenuScene extends Phaser.Scene {
       'y derrotá al Supervirus en 1:30.',
       '',
       'WASD / Flechas: moverte   ·   El disparo es automático',
-      'Juntá proteínas para subir de nivel   ·   ESC / P: pausa',
+      'Juntá proteínas para subir de nivel   ·   ESC / P: pausa   ·   M: sonido',
     ];
     this.add
       .text(cx, 450, instructions, { fontFamily: FONT, fontSize: '20px', color: '#f5f5f5', align: 'center', lineSpacing: 6 })

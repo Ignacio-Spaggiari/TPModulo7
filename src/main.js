@@ -7,6 +7,7 @@ import UIScene from './scenes/UIScene.js';
 import LevelUpScene from './scenes/LevelUpScene.js';
 import PauseScene from './scenes/PauseScene.js';
 import GameOverScene from './scenes/GameOverScene.js';
+import SoundScene from './scenes/SoundScene.js';
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -22,7 +23,7 @@ const game = new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, MenuScene, GameScene, UIScene, LevelUpScene, PauseScene, GameOverScene],
+  scene: [BootScene, MenuScene, GameScene, UIScene, LevelUpScene, PauseScene, GameOverScene, SoundScene],
 });
 
 // Solo en desarrollo: permite inspeccionar el juego desde la consola del navegador.

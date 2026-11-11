@@ -140,6 +140,15 @@ export default class BootScene extends Phaser.Scene {
       ctx.fill();
     });
 
+    // Bordes rojos para la alerta de vida baja; el centro queda transparente.
+    this.canvasTexture('lowHealth', 1280, 720, (ctx) => {
+      const gradient = ctx.createRadialGradient(640, 360, 220, 640, 360, 760);
+      gradient.addColorStop(0, 'rgba(255, 30, 50, 0)');
+      gradient.addColorStop(1, 'rgba(255, 30, 50, 0.85)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 1280, 720);
+    });
+
     this.canvasTexture('light', 512, 512, (ctx) => halo(ctx, 256, 256, 256, 'rgba(255, 235, 240, 1)'));
 
     // Plasma con manchas suaves; se repite como mosaico, así que las manchas se dibujan "envueltas".
@@ -158,6 +167,7 @@ export default class BootScene extends Phaser.Scene {
     });
 
     audio.init(this.game);
+    this.scene.launch('Sound');
     this.scene.start('Menu');
   }
 

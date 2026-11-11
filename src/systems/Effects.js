@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
-import { COLORS } from '../config.js';
+import { COLORS, FONT } from '../config.js';
 
 const ADD = Phaser.BlendModes.ADD;
+const MAX_DAMAGE_NUMBERS = 60;
 
 // Cada tamaño de explosión tiene sus propias partículas: cuanto más grande el enemigo,
 // más lejos y más tiempo vuelan, y más grande es el destello y la onda expansiva.
@@ -15,6 +16,7 @@ export default class Effects {
   constructor(scene) {
     this.scene = scene;
     this.pulseTween = null;
+    this.damageNumbers = [];
 
     this.sparks = {};
     for (const [tier, config] of Object.entries(SPARK_TIERS)) {
@@ -115,6 +117,39 @@ export default class Effects {
       duration: 320 + size * 70,
       ease: 'Cubic.out',
       onComplete: () => ring.destroy(),
+    });
+  }
+
+  // Número que sube y se desvanece donde pegó un anticuerpo. Los textos se reutilizan
+  // en vez de crearse cada vez, porque generar un texto nuevo es costoso.
+  damageNumber(x, y, value) {
+    let text = this.damageNumbers.find((number) => !number.active);
+    if (!text) {
+      if (this.damageNumbers.length >= MAX_DAMAGE_NUMBERS) return;
+      text = this.scene.add
+        .text(0, 0, '', { fontFamily: FONT, fontSize: '18px', fontStyle: 'bold', stroke: '#3a0a12', strokeThickness: 4 })
+        .setOrigin(0.5)
+        .setDepth(12);
+      this.damageNumbers.push(text);
+    }
+
+    text
+      .setActive(true)
+      .setVisible(true)
+      .setText(value)
+      .setColor(value >= 5 ? '#ffe066' : '#ffffff')
+      .setPosition(x + Phaser.Math.Between(-10, 10), y - 12)
+      .setAlpha(1)
+      .setScale(1.4);
+
+    this.scene.tweens.add({
+      targets: text,
+      y: text.y - 36,
+      scale: 1,
+      alpha: 0,
+      duration: 650,
+      ease: 'Quad.out',
+      onComplete: () => text.setActive(false).setVisible(false),
     });
   }
 

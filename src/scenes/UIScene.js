@@ -1,10 +1,13 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONT } from '../config.js';
 import { countUpgradeLevels, TOTAL_UPGRADE_LEVELS } from '../systems/Upgrades.js';
+import { audio } from '../systems/Audio.js';
 
 const BAR_WIDTH = 260;
 const BOSS_BAR_WIDTH = 520;
 const XP_BAR_HEIGHT = 12;
+const LOW_HEALTH = 0.3; // fracción de la vida máxima a partir de la cual empieza la alerta
+const HEARTBEAT_INTERVAL = 900;
 
 // HUD superpuesto: lee el estado de GameScene en cada frame y lo dibuja.
 export default class UIScene extends Phaser.Scene {
@@ -15,6 +18,10 @@ export default class UIScene extends Phaser.Scene {
   create() {
     this.gameScene = this.scene.get('Game');
     this.bossWarned = false;
+    this.heartbeatTimer = HEARTBEAT_INTERVAL;
+
+    // Va primero para quedar por debajo del resto del HUD.
+    this.dangerOverlay = this.add.image(0, 0, 'lowHealth').setOrigin(0).setAlpha(0);
 
     const style = { fontFamily: FONT, fontSize: '22px', color: '#f5f5f5', fontStyle: 'bold' };
     this.bars = this.add.graphics();
@@ -33,10 +40,12 @@ export default class UIScene extends Phaser.Scene {
     }
   }
 
-  update() {
+  update(time, delta) {
     const game = this.gameScene;
     const { player } = game;
     if (!player) return;
+
+    this.updateLowHealth(player, game, time, delta);
 
     this.drawBars(player, game);
 
@@ -61,6 +70,28 @@ export default class UIScene extends Phaser.Scene {
       this.bossWarned = true;
       this.bossText.setVisible(true);
       this.showMessage('¡Apareció el Supervirus!\nDerrotalo antes de que termine el tiempo');
+    }
+  }
+
+  // Con poca vida los bordes laten en rojo y suena un latido; más rápido e intenso cuanto menos vida queda.
+  updateLowHealth(player, game, time, delta) {
+    const ratio = player.health / player.stats.maxHealth;
+    const active = ratio < LOW_HEALTH && !game.isOver && !game.scene.isPaused();
+
+    if (!active) {
+      this.dangerOverlay.setAlpha(0);
+      this.heartbeatTimer = HEARTBEAT_INTERVAL;
+      return;
+    }
+
+    const intensity = 1 - ratio / LOW_HEALTH;
+    const pulse = 0.5 + 0.5 * Math.sin(time * 0.007);
+    this.dangerOverlay.setAlpha((0.3 + 0.4 * pulse) * (0.5 + 0.5 * intensity));
+
+    this.heartbeatTimer += delta;
+    if (this.heartbeatTimer >= HEARTBEAT_INTERVAL - intensity * 300) {
+      this.heartbeatTimer = 0;
+      audio.play('heartbeat');
     }
   }
 

@@ -1,6 +1,6 @@
 # GDD — Leuco: Defensa Celular
 
-> Game Design Document · Versión 0.5 · Noviembre 2026
+> Game Design Document · Versión 1.0 · Noviembre 2026
 
 ---
 
@@ -51,6 +51,8 @@ Una infección entró al torrente sanguíneo. Leuco, un glóbulo blanco recién 
 | Elegir mejora | `1` `2` `3` o click |
 | Pausa | `ESC` o `P` |
 | Empezar / Reiniciar | `ENTER` o `R` (en las pantallas de fin) |
+| Volver al menú | `Q` (en la pausa y en la pantalla final) |
+| Silenciar / activar sonido | `M` o el ícono de parlante (abajo a la derecha) |
 
 ### 4.3 Jugador (Leuco)
 
@@ -146,6 +148,10 @@ Cuando el jugador tiene **las 25 mejoras al máximo**, empieza la fase final:
 - **Arriba a la izquierda:** barra de vida y nivel.
 - **Arriba a la derecha:** puntaje.
 - **Abajo:** barra de XP a lo ancho de la pantalla.
+- **Abajo a la derecha:** ícono de parlante para silenciar el juego. Está en todas las pantallas y la preferencia se recuerda entre partidas.
+- **Números de daño:** cada impacto muestra un número que sube y se desvanece; se pone amarillo cuando el daño es de 5 o más.
+- **Alerta de vida baja:** con menos del 30 % de vida, los bordes de la pantalla laten en rojo y suena un latido, más rápido e intenso cuanto menos vida queda.
+- **Pausa:** muestra las 6 mejoras con un casillero por nivel, para ver qué falta para llegar al jefe.
 
 ---
 
@@ -210,6 +216,7 @@ Todo el audio se genera por código con la Web Audio API, sin archivos externos.
 | Botones y selección | Click suave |
 | Aparición del Supervirus | Rugido grave |
 | Victoria / Derrota | Fanfarria ascendente / melodía descendente |
+| Vida baja | Latido grave |
 
 ---
 

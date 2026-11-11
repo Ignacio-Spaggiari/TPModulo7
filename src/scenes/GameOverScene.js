@@ -45,11 +45,11 @@ export default class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     createButton(this, cx - 150, 540, 'Reintentar (R)', () => this.retry());
-    createButton(this, cx + 150, 540, 'Menú (M)', () => this.goToMenu());
+    createButton(this, cx + 150, 540, 'Menú (Q)', () => this.goToMenu());
 
     this.input.keyboard.on('keydown-R', this.retry, this);
     this.input.keyboard.on('keydown-ENTER', this.retry, this);
-    this.input.keyboard.on('keydown-M', this.goToMenu, this);
+    this.input.keyboard.on('keydown-Q', this.goToMenu, this);
   }
 
   update(time, delta) {
