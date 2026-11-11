@@ -1,6 +1,6 @@
 # GDD — Leuco: Defensa Celular
 
-> Game Design Document · Versión 0.4 · Noviembre 2026
+> Game Design Document · Versión 0.5 · Noviembre 2026
 
 ---
 
@@ -172,11 +172,21 @@ Cuando el jugador tiene **las 25 mejoras al máximo**, empieza la fase final:
 - **Iluminación:** una luz suave acompaña a Leuco. La cámara aplica *bloom* (las zonas claras irradian brillo) y una viñeta que oscurece los bordes.
 - **Profundidad:** el fondo tiene dos capas de glóbulos rojos con *parallax*: la lejana es más chica y transparente, y se mueve más lento con la cámara.
 - **Torrente líquido:** el plasma y los glóbulos fluyen constantemente. Al moverse, Leuco deja una estela de plasma y burbujas, y aparta los glóbulos cercanos.
-- **Impacto:** los enemigos estallan en partículas de su color al morir, y la cámara tiembla levemente cuando Leuco recibe daño.
+- **Explosiones:** cada enemigo explota al morir con un destello, una onda expansiva de su color, chispas y pedazos de membrana. Cuanto más grande es el enemigo, más espectacular es la explosión:
+
+| Enemigo | Explosión |
+|---|---|
+| Virus | Pequeña: destello y chispas |
+| Bacteria | Mediana: más chispas, más alcance y algunos pedazos de membrana |
+| Parásito | Grande: onda expansiva amplia, muchos pedazos y un leve temblor de cámara |
+| Supervirus | Cadena de 8 explosiones seguida de una explosión final enorme, destello de pantalla y temblor fuerte |
+
+- **Mejoras:** al aplicar una mejora, Leuco se agranda un instante y vuelve a su tamaño, su resplandor se intensifica y suelta una onda y destellos violetas y celestes.
+- **Daño recibido:** la cámara tiembla levemente cuando Leuco recibe daño.
 
 ### Sonido
 
-Todo el audio se genera por código con la Web Audio API, sin archivos externos.
+Todo el audio se genera por código con la Web Audio API, sin archivos externos. Un compresor en la salida baja el volumen automáticamente cuando suenan muchos efectos juntos, para que no sature.
 
 **Música**
 
@@ -192,7 +202,8 @@ Todo el audio se genera por código con la Web Audio API, sin archivos externos.
 |---|---|
 | Disparo de anticuerpos | Zap corto y agudo |
 | Impacto en un enemigo | Golpe breve |
-| Muerte de un enemigo | Estallido con caída de tono |
+| Muerte de un enemigo | Explosión según el tamaño: los enemigos grandes suenan más graves y largos, no más fuertes |
+| Mejora aplicada | Barrido ascendente |
 | Daño recibido | Golpe grave con ruido |
 | Recoger proteína o plaqueta | Blip agudo |
 | Subida de nivel | Arpegio ascendente |

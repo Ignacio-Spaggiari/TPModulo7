@@ -19,6 +19,7 @@ import Projectile from '../entities/Projectile.js';
 import Pickup from '../entities/Pickup.js';
 import WaveManager from '../systems/WaveManager.js';
 import BloodStream, { applyCameraFX } from '../systems/Background.js';
+import Effects from '../systems/Effects.js';
 import { audio } from '../systems/Audio.js';
 import { pickUpgradeOptions, countUpgradeLevels, TOTAL_UPGRADE_LEVELS } from '../systems/Upgrades.js';
 
@@ -87,8 +88,10 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
-  // Luz alrededor de Leuco, estela líquida al moverse y estallidos al matar enemigos.
+  // Luz alrededor de Leuco, estela líquida al moverse, explosiones y feedback de mejoras.
   createEffects() {
+    this.effects = new Effects(this);
+
     const { x, y } = this.player;
 
     this.playerLight = this.add.image(x, y, 'light').setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.16).setScale(1.6).setDepth(-2);
@@ -120,17 +123,6 @@ export default class GameScene extends Phaser.Scene {
         emitting: false,
       })
       .setDepth(2);
-
-    this.deathBurst = this.add
-      .particles(0, 0, 'droplet', {
-        lifespan: 450,
-        speed: { min: 60, max: 200 },
-        scale: { start: 0.55, end: 0 },
-        alpha: { start: 0.9, end: 0 },
-        blendMode: 'ADD',
-        emitting: false,
-      })
-      .setDepth(7);
   }
 
   updateEffects(delta) {
@@ -276,14 +268,14 @@ export default class GameScene extends Phaser.Scene {
     this.score += config.score;
     this.kills += 1;
     enemy.die();
-    audio.play('enemyDeath');
-    this.deathBurst.setParticleTint(config.color);
-    this.deathBurst.explode(config.boss ? 60 : 10, enemy.x, enemy.y);
+    audio.play(config.deathSound);
 
     if (config.boss) {
-      this.endGame(true);
+      const duration = this.effects.bossDeath(enemy.x, enemy.y, config.color, config.explosion);
+      this.endGame(true, null, duration + 1200);
       return;
     }
+    this.effects.explode(enemy.x, enemy.y, config.color, config.explosion);
 
     this.dropPickup(enemy.x, enemy.y, 'xp', config.xp);
     if (Math.random() < HEAL_DROP_CHANCE) this.dropPickup(enemy.x + 12, enemy.y, 'heal', HEAL_AMOUNT);
@@ -366,6 +358,8 @@ export default class GameScene extends Phaser.Scene {
     this.upgradeLevels[upgrade.id] = (this.upgradeLevels[upgrade.id] || 0) + 1;
     upgrade.apply(this.player);
     this.pendingLevelUps -= 1;
+    this.effects.upgradePulse(this.player, this.playerGlow);
+    audio.play('powerUp');
 
     if (!this.bossPhase && countUpgradeLevels(this.upgradeLevels) >= TOTAL_UPGRADE_LEVELS) {
       this.startBossPhase();
@@ -381,7 +375,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   // `reason` indica por qué se perdió: 'health' (sin vida) o 'timeout' (no venció al jefe a tiempo).
-  endGame(victory, reason) {
+  endGame(victory, reason, delay = 800) {
     this.isOver = true;
     this.physics.pause();
     this.player.setTint(victory ? 0xffffff : 0x666666);
@@ -389,7 +383,7 @@ export default class GameScene extends Phaser.Scene {
     audio.stopMusic();
     audio.play(victory ? 'victory' : 'defeat');
 
-    this.time.delayedCall(800, () => {
+    this.time.delayedCall(delay, () => {
       this.scene.stop('UI');
       this.scene.start('GameOver', {
         victory,

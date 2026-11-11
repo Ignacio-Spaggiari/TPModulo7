@@ -20,9 +20,37 @@ const SFX = {
   enemyDeath: {
     cooldown: 40,
     play: (a) => {
-      a.noise({ duration: 0.12, volume: 0.12, filter: 1500 });
-      a.tone({ type: 'sine', from: 500, to: 90, duration: 0.15, volume: 0.15 });
+      a.noise({ duration: 0.12, volume: 0.1, filter: 1500 });
+      a.tone({ type: 'sine', from: 500, to: 90, duration: 0.15, volume: 0.12 });
     },
+  },
+  // Las explosiones grandes son más graves y largas, no más fuertes: así se sienten
+  // más potentes sin tapar el resto ni saturar.
+  explosionMedium: {
+    cooldown: 80,
+    play: (a) => {
+      a.noise({ duration: 0.22, volume: 0.12, filter: 900 });
+      a.tone({ type: 'sine', from: 220, to: 50, duration: 0.25, volume: 0.15 });
+    },
+  },
+  explosionLarge: {
+    cooldown: 160,
+    play: (a) => {
+      a.noise({ duration: 0.45, volume: 0.15, filter: 600 });
+      a.tone({ type: 'sine', from: 140, to: 35, duration: 0.5, volume: 0.2 });
+    },
+  },
+  explosionBoss: {
+    cooldown: 1000,
+    play: (a) => {
+      a.noise({ duration: 1.6, volume: 0.22, filter: 450 });
+      a.tone({ type: 'sine', from: 110, to: 25, duration: 1.8, volume: 0.28 });
+      a.tone({ type: 'triangle', from: 70, to: 30, duration: 1.4, volume: 0.15, time: a.ctx.currentTime + 0.9 });
+    },
+  },
+  powerUp: {
+    cooldown: 100,
+    play: (a) => a.tone({ type: 'sine', from: 400, to: 1300, duration: 0.25, volume: 0.1 }),
   },
   playerHurt: {
     cooldown: 150,
@@ -66,9 +94,19 @@ class AudioManager {
     this.ctx = game.sound.context;
     if (!this.ctx) return;
 
+    // El compresor baja el volumen automáticamente cuando suenan muchas cosas juntas,
+    // así las explosiones en cadena no saturan ni distorsionan.
+    this.compressor = this.ctx.createDynamicsCompressor();
+    this.compressor.threshold.value = -18;
+    this.compressor.knee.value = 12;
+    this.compressor.ratio.value = 6;
+    this.compressor.attack.value = 0.003;
+    this.compressor.release.value = 0.25;
+    this.compressor.connect(this.ctx.destination);
+
     this.master = this.ctx.createGain();
     this.master.gain.value = 0.6;
-    this.master.connect(this.ctx.destination);
+    this.master.connect(this.compressor);
 
     this.sfxBus = this.createBus(0.7);
     this.musicBus = this.createBus(0.35);

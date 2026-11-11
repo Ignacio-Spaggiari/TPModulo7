@@ -33,11 +33,28 @@ export const FIRE_RANGE = 650;
 export const MULTISHOT_SPREAD = 0.18;
 export const PROJECTILE_LIFESPAN = 1500;
 
+// `explosion` define qué tan espectacular es la muerte: cuanto más grande el enemigo, más grande la explosión.
 export const ENEMIES = {
-  virus: { texture: 'virus', color: 0x5fd35f, radius: 13, health: 1, speed: 80, damage: 10, xp: 1, score: 10 },
-  bacteria: { texture: 'bacteria', color: 0xf2d14b, radius: 10, health: 2, speed: 140, damage: 8, xp: 2, score: 20 },
-  parasite: { texture: 'parasite', color: 0xa35fd3, radius: 20, health: 6, speed: 50, damage: 20, xp: 5, score: 50 },
-  supervirus: { texture: 'supervirus', color: 0x5fd35f, radius: 52, health: 4000, speed: 90, damage: 40, xp: 0, score: 2000, boss: true },
+  virus: {
+    texture: 'virus', color: 0x5fd35f, radius: 13, health: 1, speed: 80, damage: 10, xp: 1, score: 10,
+    deathSound: 'enemyDeath',
+    explosion: { tier: 'small', size: 1, sparks: 8, debris: 0 },
+  },
+  bacteria: {
+    texture: 'bacteria', color: 0xf2d14b, radius: 10, health: 2, speed: 140, damage: 8, xp: 2, score: 20,
+    deathSound: 'explosionMedium',
+    explosion: { tier: 'medium', size: 1.5, sparks: 16, debris: 5 },
+  },
+  parasite: {
+    texture: 'parasite', color: 0xa35fd3, radius: 20, health: 6, speed: 50, damage: 20, xp: 5, score: 50,
+    deathSound: 'explosionLarge',
+    explosion: { tier: 'large', size: 2.4, sparks: 30, debris: 12, shake: 0.004 },
+  },
+  supervirus: {
+    texture: 'supervirus', color: 0x5fd35f, radius: 52, health: 4000, speed: 90, damage: 40, xp: 0, score: 2000, boss: true,
+    deathSound: 'explosionBoss',
+    explosion: { tier: 'large', size: 6, sparks: 90, debris: 40, shake: 0.02 },
+  },
 };
 
 // Cada oleada empieza en `from` (segundos) y define qué aparece y cada cuánto (ms).

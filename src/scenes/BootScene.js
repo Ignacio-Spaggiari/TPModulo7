@@ -115,6 +115,19 @@ export default class BootScene extends Phaser.Scene {
     // Gota suave y blanca: se usa para la estela, las partículas y las luces (se tiñe en el juego).
     this.canvasTexture('droplet', 32, 32, (ctx) => halo(ctx, 16, 16, 16, 'rgba(255, 255, 255, 1)'));
 
+    this.canvasTexture('ring', 128, 128, (ctx) => {
+      ctx.shadowColor = '#ffffff';
+      ctx.shadowBlur = 10;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(64, 64, 54, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    // Gris para que al teñirlo tome el color del enemigo que explota.
+    this.canvasTexture('debris', 12, 12, (ctx) => sphere(ctx, 6, 6, 5, { light: '#ffffff', base: '#cccccc', dark: '#555555' }));
+
     this.canvasTexture('bubble', 16, 16, (ctx) => {
       ctx.strokeStyle = 'rgba(255, 220, 230, 0.8)';
       ctx.lineWidth = 1.5;
