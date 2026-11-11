@@ -1,6 +1,6 @@
 # GDD — Leuco: Defensa Celular
 
-> Game Design Document · Versión 0.3 · Noviembre 2026
+> Game Design Document · Versión 0.4 · Noviembre 2026
 
 ---
 
@@ -24,7 +24,7 @@
 1. **Fácil de entender:** solo te movés. El ataque es automático.
 2. **Presión creciente:** cada vez aparecen más enemigos, más rápidos y más resistentes.
 3. **Progreso dentro de la partida:** subís de nivel y elegís mejoras, así cada partida se siente un poco distinta.
-4. **Estética minimalista:** todo se dibuja con formas geométricas desde Phaser, sin depender de sprites externos.
+4. **Estética orgánica sin assets externos:** todo se dibuja por código, con volumen, brillos e iluminación para que el mundo se sienta vivo y líquido.
 
 ---
 
@@ -32,7 +32,7 @@
 
 Una infección entró al torrente sanguíneo. Leuco, un glóbulo blanco recién activado, es la primera línea de defensa. Tiene que fortalecerse combatiendo la infección hasta alcanzar su máximo potencial y, entonces, enfrentar al **Supervirus**, el origen de la infección, antes de que se propague por todo el cuerpo.
 
-- **Arena:** un tramo de vaso sanguíneo con fondo rojo oscuro. Glóbulos rojos decorativos flotan lentamente y no interactúan.
+- **Arena:** un tramo de vaso sanguíneo con plasma rojo oscuro que fluye. Los glóbulos rojos decorativos son arrastrados por la corriente y se apartan cuando Leuco pasa entre ellos.
 - **Tono:** arcade, colorido y con humor liviano.
 
 ---
@@ -164,6 +164,15 @@ Cuando el jugador tiene **las 25 mejoras al máximo**, empieza la fase final:
 | Parásito | `#a35fd3` |
 | Proteína (XP) | `#4fc3f7` |
 | Esporas del Supervirus | `#b8f06b` |
+
+### Efectos visuales
+
+- **Volumen:** las células y los enemigos se dibujan como esferas iluminadas desde arriba a la izquierda, con degradados, sombra y un reflejo húmedo.
+- **Brillos:** los anticuerpos, las proteínas y las esporas tienen un halo y se suman al fondo como luces. Leuco tiene un resplandor violeta que late suavemente.
+- **Iluminación:** una luz suave acompaña a Leuco. La cámara aplica *bloom* (las zonas claras irradian brillo) y una viñeta que oscurece los bordes.
+- **Profundidad:** el fondo tiene dos capas de glóbulos rojos con *parallax*: la lejana es más chica y transparente, y se mueve más lento con la cámara.
+- **Torrente líquido:** el plasma y los glóbulos fluyen constantemente. Al moverse, Leuco deja una estela de plasma y burbujas, y aparta los glóbulos cercanos.
+- **Impacto:** los enemigos estallan en partículas de su color al morir, y la cámara tiembla levemente cuando Leuco recibe daño.
 
 ### Sonido
 

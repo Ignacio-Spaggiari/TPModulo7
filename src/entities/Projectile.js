@@ -4,6 +4,8 @@ import { PROJECTILE_LIFESPAN } from '../config.js';
 export default class Projectile extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, 'antibody');
+    // Suma su color al fondo, así se ven como luces brillantes.
+    this.setBlendMode(Phaser.BlendModes.ADD);
   }
 
   // Lo usan tanto los anticuerpos del jugador como las esporas del jefe.

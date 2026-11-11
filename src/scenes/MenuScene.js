@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, FONT } from '../config.js';
-import { addRedCells } from '../systems/Background.js';
+import BloodStream, { applyCameraFX } from '../systems/Background.js';
 import { loadHighScore } from '../systems/HighScore.js';
 import { createButton } from '../ui/Button.js';
 import { audio } from '../systems/Audio.js';
@@ -13,7 +13,8 @@ export default class MenuScene extends Phaser.Scene {
   create() {
     const cx = GAME_WIDTH / 2;
     audio.playMusic('menu');
-    addRedCells(this, 18, GAME_WIDTH, GAME_HEIGHT);
+    this.stream = new BloodStream(this, GAME_WIDTH, GAME_HEIGHT, { farCells: 14, nearCells: 10, fixedToCamera: true });
+    applyCameraFX(this.cameras.main);
 
     this.add
       .text(cx, 130, 'LEUCO', { fontFamily: FONT, fontSize: '96px', color: '#f5f5f5', fontStyle: 'bold' })
@@ -45,6 +46,10 @@ export default class MenuScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.input.keyboard.on('keydown-ENTER', () => this.startGame());
+  }
+
+  update(time, delta) {
+    this.stream.update(delta);
   }
 
   startGame() {

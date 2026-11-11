@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, FONT } from '../config.js';
-import { addRedCells } from '../systems/Background.js';
+import { GAME_WIDTH, GAME_HEIGHT, FONT } from '../config.js';
+import BloodStream, { applyCameraFX } from '../systems/Background.js';
 import { loadHighScore, saveHighScore } from '../systems/HighScore.js';
 import { createButton } from '../ui/Button.js';
 import { audio } from '../systems/Audio.js';
@@ -12,7 +12,8 @@ export default class GameOverScene extends Phaser.Scene {
 
   create({ victory, reason, score, kills, level, seconds }) {
     const cx = GAME_WIDTH / 2;
-    addRedCells(this, 18, GAME_WIDTH, 720);
+    this.stream = new BloodStream(this, GAME_WIDTH, GAME_HEIGHT, { farCells: 14, nearCells: 10, fixedToCamera: true });
+    applyCameraFX(this.cameras.main);
 
     const isNewRecord = score > loadHighScore();
     if (isNewRecord) saveHighScore(score);
@@ -49,6 +50,10 @@ export default class GameOverScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-R', this.retry, this);
     this.input.keyboard.on('keydown-ENTER', this.retry, this);
     this.input.keyboard.on('keydown-M', this.goToMenu, this);
+  }
+
+  update(time, delta) {
+    this.stream.update(delta);
   }
 
   retry() {

@@ -14,6 +14,7 @@ export default class Pickup extends Phaser.Physics.Arcade.Sprite {
     this.setTexture(kind === 'heal' ? 'platelet' : 'protein');
     this.enableBody(true, x, y, true, true);
     this.setScale(kind === 'xp' && value >= 5 ? 1.6 : 1);
+    this.setBlendMode(kind === 'xp' ? Phaser.BlendModes.ADD : Phaser.BlendModes.NORMAL);
     this.setVelocity(0, 0);
     this.setDepth(3);
   }

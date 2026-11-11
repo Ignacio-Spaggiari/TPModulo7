@@ -34,10 +34,10 @@ export const MULTISHOT_SPREAD = 0.18;
 export const PROJECTILE_LIFESPAN = 1500;
 
 export const ENEMIES = {
-  virus: { texture: 'virus', radius: 13, health: 1, speed: 80, damage: 10, xp: 1, score: 10 },
-  bacteria: { texture: 'bacteria', radius: 10, health: 2, speed: 140, damage: 8, xp: 2, score: 20 },
-  parasite: { texture: 'parasite', radius: 20, health: 6, speed: 50, damage: 20, xp: 5, score: 50 },
-  supervirus: { texture: 'supervirus', radius: 52, health: 4000, speed: 90, damage: 40, xp: 0, score: 2000, boss: true },
+  virus: { texture: 'virus', color: 0x5fd35f, radius: 13, health: 1, speed: 80, damage: 10, xp: 1, score: 10 },
+  bacteria: { texture: 'bacteria', color: 0xf2d14b, radius: 10, health: 2, speed: 140, damage: 8, xp: 2, score: 20 },
+  parasite: { texture: 'parasite', color: 0xa35fd3, radius: 20, health: 6, speed: 50, damage: 20, xp: 5, score: 50 },
+  supervirus: { texture: 'supervirus', color: 0x5fd35f, radius: 52, health: 4000, speed: 90, damage: 40, xp: 0, score: 2000, boss: true },
 };
 
 // Cada oleada empieza en `from` (segundos) y define qué aparece y cada cuánto (ms).

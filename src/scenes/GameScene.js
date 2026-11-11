@@ -18,7 +18,7 @@ import Enemy from '../entities/Enemy.js';
 import Projectile from '../entities/Projectile.js';
 import Pickup from '../entities/Pickup.js';
 import WaveManager from '../systems/WaveManager.js';
-import { addRedCells } from '../systems/Background.js';
+import BloodStream, { applyCameraFX } from '../systems/Background.js';
 import { audio } from '../systems/Audio.js';
 import { pickUpgradeOptions, countUpgradeLevels, TOTAL_UPGRADE_LEVELS } from '../systems/Upgrades.js';
 
@@ -53,6 +53,8 @@ export default class GameScene extends Phaser.Scene {
     this.player = new Player(this, WORLD_SIZE / 2, WORLD_SIZE / 2);
     this.cameras.main.setBounds(0, 0, WORLD_SIZE, WORLD_SIZE);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+    applyCameraFX(this.cameras.main);
+    this.createEffects();
 
     this.enemies = this.physics.add.group({ classType: Enemy, maxSize: MAX_ENEMIES });
     this.projectiles = this.physics.add.group({ classType: Projectile, maxSize: 150 });
@@ -76,9 +78,71 @@ export default class GameScene extends Phaser.Scene {
 
   createArena() {
     this.cameras.main.setBackgroundColor(COLORS.plasma);
-    addRedCells(this, 60, WORLD_SIZE, WORLD_SIZE);
-    // Paredes del vaso sanguíneo.
-    this.add.graphics().lineStyle(24, COLORS.vesselWall).strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE).setDepth(-1);
+    this.stream = new BloodStream(this, WORLD_SIZE, WORLD_SIZE, { farCells: 70, nearCells: 45 });
+
+    // Paredes del vaso sanguíneo, con un borde difuso hacia adentro.
+    const walls = this.add.graphics().setDepth(-4);
+    for (const [width, alpha] of [[90, 0.15], [60, 0.3], [30, 1]]) {
+      walls.lineStyle(width, COLORS.vesselWall, alpha).strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+    }
+  }
+
+  // Luz alrededor de Leuco, estela líquida al moverse y estallidos al matar enemigos.
+  createEffects() {
+    const { x, y } = this.player;
+
+    this.playerLight = this.add.image(x, y, 'light').setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.16).setScale(1.6).setDepth(-2);
+    this.playerGlow = this.add.image(x, y, 'droplet').setTint(COLORS.nucleus).setBlendMode(Phaser.BlendModes.ADD).setScale(3.2).setDepth(9);
+    this.tweens.add({ targets: this.playerGlow, alpha: { from: 0.25, to: 0.5 }, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+
+    this.trail = this.add
+      .particles(0, 0, 'droplet', {
+        follow: this.player,
+        lifespan: 1100,
+        speed: { min: 4, max: 20 },
+        scale: { start: 1, end: 2.6 },
+        alpha: { start: 0.4, end: 0 },
+        tint: 0xffc2d1,
+        blendMode: 'ADD',
+        frequency: 25,
+        emitting: false,
+      })
+      .setDepth(2);
+
+    this.bubbles = this.add
+      .particles(0, 0, 'bubble', {
+        follow: this.player,
+        lifespan: 1300,
+        speed: { min: 10, max: 35 },
+        scale: { start: 0.9, end: 0.2 },
+        alpha: { start: 1, end: 0 },
+        frequency: 110,
+        emitting: false,
+      })
+      .setDepth(2);
+
+    this.deathBurst = this.add
+      .particles(0, 0, 'droplet', {
+        lifespan: 450,
+        speed: { min: 60, max: 200 },
+        scale: { start: 0.55, end: 0 },
+        alpha: { start: 0.9, end: 0 },
+        blendMode: 'ADD',
+        emitting: false,
+      })
+      .setDepth(7);
+  }
+
+  updateEffects(delta) {
+    this.stream.update(delta, this.player);
+
+    const { x, y } = this.player;
+    this.playerLight.setPosition(x, y);
+    this.playerGlow.setPosition(x, y);
+
+    const moving = this.player.body.speed > 20;
+    this.trail.emitting = moving;
+    this.bubbles.emitting = moving;
   }
 
   update(time, delta) {
@@ -86,6 +150,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.elapsed += delta;
     this.handleMovement();
+    this.updateEffects(delta);
 
     if (this.bossPhase) {
       this.updateBoss(delta);
@@ -212,6 +277,8 @@ export default class GameScene extends Phaser.Scene {
     this.kills += 1;
     enemy.die();
     audio.play('enemyDeath');
+    this.deathBurst.setParticleTint(config.color);
+    this.deathBurst.explode(config.boss ? 60 : 10, enemy.x, enemy.y);
 
     if (config.boss) {
       this.endGame(true);
@@ -244,6 +311,7 @@ export default class GameScene extends Phaser.Scene {
     if (!this.player.takeDamage(amount, this.elapsed)) return;
 
     audio.play('playerHurt');
+    this.cameras.main.shake(120, 0.005);
     if (this.player.isDead()) this.endGame(false, 'health');
   }
 
